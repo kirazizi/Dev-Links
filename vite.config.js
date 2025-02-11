@@ -5,8 +5,14 @@ import { defineConfig } from "vite"
 export default defineConfig({
   plugins: [react()],
   resolve: {
-    build: {
-      outDir: 'dist'
-    }
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+      '@/components': path.resolve(__dirname, './src/components'),
+    },
   },
+  build: {
+    rollupOptions: {
+      external: []
+    }
+  }
 })
