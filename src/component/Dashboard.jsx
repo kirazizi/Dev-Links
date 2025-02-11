@@ -180,8 +180,8 @@ const Dashboard = () => {
         </div>
       </header>
 
-      <main className="max-w-screen-2xl mx-auto px-6 py-8 grid grid-cols-[308px,1fr] gap-40 ml-40">
-        <div className="relative">
+      <main className="max-w-screen-2xl mx-auto px-6 py-8 grid md:grid-cols-[308px,1fr] gap-8 md:gap-40 md:ml-40">
+        <div className="relative hidden md:block">
           <img src={MobilePreview} alt="Mobile Preview" className="w-full" />
           <div className="absolute top-[280px] left-[35px] right-[35px] space-y-5">
             {links.map((link) => {
