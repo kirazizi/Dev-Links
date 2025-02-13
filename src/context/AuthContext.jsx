@@ -6,6 +6,14 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
+    const [links, setLinks] = useState([]);
+    const [profile, setProfile] = useState({
+        id: null,
+        first_name: "",
+        last_name: "",
+        email: "",
+        image: "",
+      });
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -33,7 +41,7 @@ export const AuthProvider = ({ children }) => {
     };
     
     return (
-        <AuthContext.Provider value={{ user, login, logout }}>
+        <AuthContext.Provider value={{ user, links, setLinks, profile, setProfile, login, logout }}>
         {children}
         </AuthContext.Provider>
     );
