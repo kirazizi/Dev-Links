@@ -5,7 +5,6 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Mail, Lock } from "lucide-react"
 import { useNavigate, useLocation } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode';
 import { useAuth } from '@/context/AuthContext';
 
 const LoginPage = () => {
@@ -43,10 +42,6 @@ const LoginPage = () => {
 
   const onLoginSuccess = (data) => {
     login(data.access_token);
-    // localStorage.setItem('authToken', data.access_token);
-    // const decodedToken = jwtDecode(data.access_token);
-    // console.log('decodedToken:', decodedToken.sub);
-    // navigate('/dashboard');
   };
 
   useEffect(() => {

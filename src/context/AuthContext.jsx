@@ -7,6 +7,7 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [links, setLinks] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [profile, setProfile] = useState({
         id: null,
         first_name: "",
@@ -15,17 +16,22 @@ export const AuthProvider = ({ children }) => {
         image: "",
       });
 
-    useEffect(() => {
+      useEffect(() => {
         const checkAuth = async () => {
+            setLoading(true);
             const token = localStorage.getItem('authToken');
             if (token) {
-                const decodedToken = jwtDecode(token);
-                setUser(decodedToken.sub);
+                try {
+                    const decodedToken = jwtDecode(token);
+                    setUser(decodedToken.sub);
+                } catch (error) {
+                    console.error('Invalid token:', error);
+                    localStorage.removeItem('authToken');
+                    setUser(null);
+                }
             }
-            else{
-                setUser(null);
-            }
-        }
+            setLoading(false);
+        };
         checkAuth();
     }, []);
     
@@ -41,8 +47,17 @@ export const AuthProvider = ({ children }) => {
     };
     
     return (
-        <AuthContext.Provider value={{ user, links, setLinks, profile, setProfile, login, logout }}>
-        {children}
+        <AuthContext.Provider value={{ 
+            user, 
+            loading,
+            links, 
+            setLinks, 
+            profile, 
+            setProfile, 
+            login, 
+            logout 
+        }}>
+            {children}
         </AuthContext.Provider>
     );
 }

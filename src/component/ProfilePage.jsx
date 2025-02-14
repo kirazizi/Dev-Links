@@ -25,7 +25,7 @@ const UPDATE_USER_PROFILE = gql`
 `;
 
 
-const ProfilePage = ({ refetch }) => {
+const ProfilePage = () => {
   const { profile, setProfile, user} = useAuth();
   const [successMessage, setSuccessMessage] = useState(false);
   const [updateUserProfile] = useMutation(UPDATE_USER_PROFILE);
@@ -76,8 +76,6 @@ const ProfilePage = ({ refetch }) => {
 
       setSuccessMessage(true);
       setTimeout(() => setSuccessMessage(false), 3000);
-      
-      await refetch();
       
     } catch (error) {
       console.error('Update failed:', error);

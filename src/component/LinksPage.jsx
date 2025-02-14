@@ -8,7 +8,6 @@ import { Link, SmartphoneIcon, GripVertical, Github, Youtube, Linkedin, Facebook
 import Logo from '../assets/images/logo-devlinks-large.svg';
 import Empty from "../assets/images/illustration-empty.svg";
 import { jwtDecode } from 'jwt-decode';
-import { OrbitProgress } from 'react-loading-indicators';
 import MobilePreview from './MobilePreview';
 import { useAuth } from '@/context/AuthContext';
 
@@ -16,23 +15,6 @@ import { useAuth } from '@/context/AuthContext';
 // import Youtube from '../assets/images/icon-youtube.svg';
 // import Linkedin from '../assets/images/icon-linkedin.svg';
 // import Facebook from '../assets/images/icon-facebook.svg';
-
-// const GET_USER_PROFILE = gql`
-//   query GetUserProfile {
-//     users {
-//       id
-//       email
-//       first_name
-//       last_name
-//       links {
-//         id
-//         platform
-//         url
-//       }
-//     }
-//   }
-// `;
-
 
 const UPDATE_LINK = gql`
   mutation UpdateLink($id: uuid!, $title: String!, $url: String!) {
@@ -75,7 +57,7 @@ const platforms = {
 };
 
 
-const LinksPage = ({ refetch }) => {
+const LinksPage = () => {
 
   const { links, setLinks } = useAuth();
 
@@ -130,9 +112,7 @@ const LinksPage = ({ refetch }) => {
 
       setIsSaving(false);
 
-      console.log('Links saved successfully');
-      
-      await refetch();
+      console.log('Links saved successfully');;
 
     }
     catch(error){
