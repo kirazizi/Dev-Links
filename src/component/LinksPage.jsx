@@ -1,20 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { useQuery, gql, useMutation } from '@apollo/client';
-import { Button } from "@/components/ui/button"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Input } from "@/components/ui/input"
-import { Link, SmartphoneIcon, GripVertical, Github, Youtube, Linkedin, Facebook, ChevronRight } from "lucide-react"
-import Logo from '../assets/images/logo-devlinks-large.svg';
+import React, { useState } from 'react';
+import { useMutation } from '@apollo/client';
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { GripVertical, Github, Youtube, Linkedin, Facebook } from "lucide-react";
 import Empty from "../assets/images/illustration-empty.svg";
 import { jwtDecode } from 'jwt-decode';
 import MobilePreview from './MobilePreview';
 import { useAuth } from '@/context/AuthContext';
-
-// import Github from '../assets/images/icon-github.svg';
-// import Youtube from '../assets/images/icon-youtube.svg';
-// import Linkedin from '../assets/images/icon-linkedin.svg';
-// import Facebook from '../assets/images/icon-facebook.svg';
+import { z } from 'zod';
+import { gql } from '@apollo/client';
 
 const UPDATE_LINK = gql`
   mutation UpdateLink($id: uuid!, $title: String!, $url: String!) {
@@ -49,6 +44,18 @@ const DELETE_LINKS = gql`
   }
 `;
 
+
+const linkSchema = z.object({
+  id: z.string(),
+  platform: z.string().min(1, "Platform can't be empty"),
+  url: z.string().url("Please enter a valid URL").min(1, "Can't be empty"),
+  isNew: z.boolean().optional(),
+});
+
+const formSchema = z.object({
+  links: z.array(linkSchema),
+});
+
 const platforms = {
   github: { name: 'GitHub', color: "#1A1A1A", icon: Github },
   youtube: { name: 'YouTube', color: "#EE1D52", icon: Youtube },
@@ -56,12 +63,10 @@ const platforms = {
   facebook: { name: 'Facebook', color: "#1877F2", icon: Facebook },
 };
 
-
 const LinksPage = () => {
-
   const { links, setLinks } = useAuth();
-
   const [removedLinks, setRemovedLinks] = useState([]);
+  const [errors, setErrors] = useState({});
   const token = localStorage.getItem('authToken');
   const auth0Id = jwtDecode(token).sub;
   const [insertLinks] = useMutation(INSERT_LINKS);
@@ -73,50 +78,65 @@ const LinksPage = () => {
       id: `${crypto.randomUUID()}`,
       platform: "github",
       url: "",
-      isNew: true
-    }
+      isNew: true,
+    };
     setLinks([...links, newLink]);
   };
 
   const removeLink = (id) => {
-    setLinks(links.filter(link => link.id !== id));
+    setLinks(links.filter((link) => link.id !== id));
     setRemovedLinks([...removedLinks, id]);
   };
 
   const updateLink = (id, updates) => {
-    setLinks(links.map(link => 
-      link.id === id ? { ...link, ...updates } : link
-    ));
+    setLinks(links.map((link) => (link.id === id ? { ...link, ...updates } : link)));
   };
-
 
   const handleSave = async () => {
     try {
+      const validationResult = formSchema.safeParse({ links });
+
+      if (!validationResult.success) {
+        const errorMap = {};
+        validationResult.error.errors.forEach((err) => {
+          const index = err.path[1];
+          errorMap[index] = errorMap[index] || {};
+          errorMap[index][err.path[2]] = { message: err.message };
+        });
+        setErrors({ links: errorMap });
+        return;
+      }
+
+      setErrors({});
 
       setIsSaving(true);
-      await Promise.all(removedLinks.map(async (id) => {
-        await deleteLinks({ variables: { id } });
-      }));
 
+      await Promise.all(
+        removedLinks.map(async (id) => {
+          await deleteLinks({ variables: { id } });
+        })
+      );
       setRemovedLinks([]);
 
-      const LinkSave = links.filter(link => link.isNew).map(link => ({
-        platform: link.platform,
-        url: link.url,
-        user_id: auth0Id
-      }));
-      
-      await insertLinks({ variables: { objects: LinkSave } });
+      const LinkSave = links
+        .filter((link) => link.isNew)
+        .map((link) => ({
+          platform: link.platform,
+          url: link.url,
+          user_id: auth0Id,
+        }));
 
-      setLinks(links.map(link => ({ ...link, isNew: false })));
+      if (LinkSave.length > 0) {
+        await insertLinks({ variables: { objects: LinkSave } });
+      }
 
+      setLinks(links.map((link) => ({ ...link, isNew: false })));
       setIsSaving(false);
 
-      console.log('Links saved successfully');;
-
-    }
-    catch(error){
+      console.log('Links saved successfully');
+    } catch (error) {
       console.error('Error saving links:', error);
+      setIsSaving(false);
     }
   };
 
@@ -162,8 +182,8 @@ const LinksPage = () => {
                       <GripVertical className="h-6 w-6 text-gray-500" />
                       <span className="font-bold">Link #{index + 1}</span>
                     </div>
-                    <button 
-                      onClick={() => removeLink(link.id)} 
+                    <button
+                      onClick={() => removeLink(link.id)}
                       className="text-gray-500 hover:text-gray-700"
                     >
                       Remove
@@ -173,35 +193,44 @@ const LinksPage = () => {
                   <div className="space-y-3">
                     <div className="space-y-2">
                       <label className="text-sm text-gray-500">Platform</label>
-                      <Select 
-                        value={link.platform} 
+                      <Select
+                        value={link.platform}
                         onValueChange={(value) => updateLink(link.id, { platform: value })}
                       >
-                        <SelectTrigger className="h-12">
-                            <SelectValue>
-                          </SelectValue>
+                        <SelectTrigger className={`h-12 ${errors.links?.[index]?.platform ? "border-[#FF3939] focus-visible:ring-[#FF3939]" : ""}`}>
+                          <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
                           {Object.entries(platforms).map(([value, { icon: Icon }]) => (
                             <SelectItem key={value} value={value}>
                               <div className="flex items-center gap-2">
                                 <Icon className="h-5 w-5" />
-                                  {platforms[value].name}
+                                {platforms[value].name}
                               </div>
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
+                      {errors.links?.[index]?.platform && (
+                        <p className="text-[#FF3939] text-sm mt-1">{errors.links[index].platform.message}</p>
+                      )}
                     </div>
 
                     <div className="space-y-2">
                       <label className="text-sm text-gray-500">Link</label>
-                      <Input
-                        value={link.url}
-                        onChange={(e) => updateLink(link.id, { url: e.target.value })}
-                        placeholder={`e.g. https://${link.platform}.com/username`}
-                        className="h-12"
-                      />
+                      <div className="relative">
+                        <Input
+                          value={link.url}
+                          onChange={(e) => updateLink(link.id, { url: e.target.value })}
+                          placeholder={`e.g. https://${link.platform}.com/username`}
+                          className={`h-12 pr-24 ${errors.links?.[index]?.url ? "border-[#FF3939] focus-visible:ring-[#FF3939]" : ""}`}
+                        />
+                        {errors.links?.[index]?.url && (
+                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[#FF3939]">
+                            {errors.links[index].url.message}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -210,7 +239,7 @@ const LinksPage = () => {
           )}
         </div>
       </main>
-      
+
       <footer className="border-t bg-white">
         <div className="max-w-screen-2xl mx-auto px-6 py-4 flex justify-end">
           <Button
@@ -222,7 +251,6 @@ const LinksPage = () => {
           </Button>
         </div>
       </footer>
-
     </div>
   );
 };
