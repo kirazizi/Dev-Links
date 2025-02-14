@@ -1,150 +1,196 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import Logo from '../assets/images/logo-devlinks-large.svg';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+import axios from "axios"
 import { Mail, Lock } from "lucide-react"
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom"
 
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form"
+import Logo from '../assets/images/logo-devlinks-large.svg';
 
-const SignupPage = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const navigate = useNavigate();
-  
+const signupSchema = z
+  .object({
+    email: z.string().min(1, "Can't be empty").email("Please enter a valid email"),
+    password: z.string().min(8, "Must be at least 8 characters"),
+    confirmPassword: z.string().min(1, "Please check again"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  })
 
-  const handleSignup = async (e) => {
-    e.preventDefault();
-    setError('');
-    setIsSubmitting(true);
+export default function SignupPage() {
+  const navigate = useNavigate()
 
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      setIsSubmitting(false);
-      return;
-    }
+  const form = useForm({
+    resolver: zodResolver(signupSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
+  })
 
+  const handleSignup = async (data) => {
     try {
-      const response = await axios.post(
+      await axios.post(
         `https://${import.meta.env.VITE_AUTH0_DOMAIN}/dbconnections/signup`,
         {
           client_id: import.meta.env.VITE_AUTH0_CLIENT_ID,
-          email: email,
-          password: password,
-          connection: 'Username-Password-Authentication',
+          email: data.email,
+          password: data.password,
+          connection: "Username-Password-Authentication",
         },
         {
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
-        }
-      );
+        },
+      )
 
-      navigate('/login');
+      navigate("/login")
     } catch (error) {
-      console.error('Signup error:', error);
-      setError(error.response?.data?.message || 'Signup failed. Please try again.');
-    } finally {
-      setIsSubmitting(false);
+      console.error("Signup error:", error)
+      form.setError("root", {
+        message: error.response?.data?.message || "Signup failed. Please try again.",
+      })
     }
-  };
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center p-8">
       <div className="mb-16">
-        <img
-          src={Logo}
-          alt="Devlinks Logo"
-          width={146}
-          height={40}
-          className="w-36"
-        />
+        <img src={Logo} alt="Devlinks Logo" width={146} height={40} className="w-36" />
       </div>
 
       <div className="w-full max-w-[476px] space-y-8">
         <div className="space-y-2">
           <h1 className="text-4xl font-bold text-[#333333]">Create account</h1>
-          <p className="text-[#737373]">Let’s get you started sharing your links!</p>
+          <p className="text-[#737373]">Let's get you started sharing your links!</p>
         </div>
 
-        <form className="space-y-6" onSubmit={handleSignup}>
-          {error && (
-            <div className="text-red-500 text-sm text-center">
-              {error}
-            </div>
-          )}
+        {form.formState.errors.root && (
+          <div className="text-[#FF3939] text-sm text-center">{form.formState.errors.root.message}</div>
+        )}
 
-          <div className="space-y-2">
-            <label htmlFor="email" className="block text-sm text-[#333333]">
-              Email address
-            </label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#737373] h-5 w-5" />
-              <Input 
-                id="email" 
-                type="email" 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="e.g. alex@email.com" 
-                className="h-12 pl-10"
-                required
-              />
-            </div>
-          </div>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSignup)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem className="space-y-2">
+                  <FormLabel
+                    className={`block text-sm ${form.formState.errors.email ? "text-[#FF3939]" : "text-[#333333]"}`}
+                  >
+                    Email address
+                  </FormLabel>
+                  <div className="relative">
+                    <Mail
+                      className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 ${form.formState.errors.email ? "text-[#FF3939]" : "text-[#737373]"}`}
+                    />
+                    <div className="relative">
+                      <FormControl>
+                        <Input
+                          placeholder="e.g. alex@email.com"
+                          className={`h-12 pl-10 pr-24 ${form.formState.errors.email ? "border-[#FF3939] focus-visible:ring-[#FF3939]" : ""}`}
+                          {...field}
+                        />
+                      </FormControl>
+                      {form.formState.errors.email && (
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[#FF3939]">
+                          {form.formState.errors.email.message}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </FormItem>
+              )}
+            />
 
-          <div className="space-y-2">
-            <label htmlFor="password" className="block text-sm text-[#333333]">
-              Create password
-            </label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#737373] h-5 w-5" />
-              <Input 
-                id="password" 
-                type="password" 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="At least 8 characters" 
-                className="h-12 pl-10"
-                minLength="8"
-                required
-              />
-            </div>
-          </div>
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem className="space-y-2">
+                  <FormLabel
+                    className={`block text-sm ${form.formState.errors.password ? "text-[#FF3939]" : "text-[#333333]"}`}
+                  >
+                    Create password
+                  </FormLabel>
+                  <div className="relative">
+                    <Lock
+                      className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 ${form.formState.errors.password ? "text-[#FF3939]" : "text-[#737373]"}`}
+                    />
+                    <div className="relative">
+                      <FormControl>
+                        <Input
+                          type="password"
+                          placeholder="At least 8 characters"
+                          className={`h-12 pl-10 pr-32 ${form.formState.errors.password ? "border-[#FF3939] focus-visible:ring-[#FF3939]" : ""}`}
+                          {...field}
+                        />
+                      </FormControl>
+                      {form.formState.errors.password && (
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[#FF3939]">
+                          {form.formState.errors.password.message}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </FormItem>
+              )}
+            />
 
-          <div className="space-y-2">
-            <label htmlFor="confirmPassword" className="block text-sm text-[#333333]">
-              Confirm password
-            </label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#737373] h-5 w-5" />
-              <Input 
-                id="confirmPassword" 
-                type="password" 
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="At least 8 characters" 
-                className="h-12 pl-10"
-                minLength="8"
-                required
-              />
-            </div>
-            <p className="text-sm text-[#737373]">Password must contain at least 8 characters</p>
-          </div>
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem className="space-y-2">
+                  <FormLabel
+                    className={`block text-sm ${form.formState.errors.confirmPassword ? "text-[#FF3939]" : "text-[#333333]"}`}
+                  >
+                    Confirm password
+                  </FormLabel>
+                  <div className="relative">
+                    <Lock
+                      className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 ${form.formState.errors.confirmPassword ? "text-[#FF3939]" : "text-[#737373]"}`}
+                    />
+                    <div className="relative">
+                      <FormControl>
+                        <Input
+                          type="password"
+                          placeholder="At least 8 characters"
+                          className={`h-12 pl-10 pr-32 ${form.formState.errors.confirmPassword ? "border-[#FF3939] focus-visible:ring-[#FF3939]" : ""}`}
+                          {...field}
+                        />
+                      </FormControl>
+                      {form.formState.errors.confirmPassword && (
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[#FF3939]">
+                          {form.formState.errors.confirmPassword.message}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <p className="text-sm text-[#737373]">Password must contain at least 8 characters</p>
+                </FormItem>
+              )}
+            />
 
-          <Button 
-            type="submit" 
-            className="w-full h-12 bg-[#633CFF] hover:bg-[#BEADFF] text-white font-medium"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? 'Creating account...' : 'Create new account'}
-          </Button>
-        </form>
+            <Button
+              type="submit"
+              className="w-full h-12 bg-[#633CFF] hover:bg-[#BEADFF] text-white font-medium"
+              disabled={form.formState.isSubmitting}
+            >
+              {form.formState.isSubmitting ? "Creating account..." : "Create new account"}
+            </Button>
+          </form>
+        </Form>
 
         <p className="text-center text-[#737373]">
-          Already have an account? {""}
+          Already have an account?{" "}
           <a href="/login" className="text-[#633CFF] hover:underline">
             Login
           </a>
@@ -152,6 +198,5 @@ const SignupPage = () => {
       </div>
     </div>
   )
-};
+}
 
-export default SignupPage;
