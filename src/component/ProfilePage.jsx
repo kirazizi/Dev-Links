@@ -8,8 +8,8 @@ import { gql, useMutation } from "@apollo/client";
 import { z } from "zod";
 
 const profileSchema = z.object({
-  first_name: z.string().min(1, "First name can't be empty"),
-  last_name: z.string().min(1, "Last name can't be empty"),
+  first_name: z.string().min(1, "Can't be empty"),
+  last_name: z.string().min(1, "Can't be empty"),
   email: z.string().optional(),
   image: z.string().optional(),
 });

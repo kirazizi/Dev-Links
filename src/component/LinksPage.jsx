@@ -47,7 +47,7 @@ const DELETE_LINKS = gql`
 
 const linkSchema = z.object({
   id: z.string(),
-  platform: z.string().min(1, "Platform can't be empty"),
+  platform: z.string().min(1, "Can't be empty"),
   url: z.string().url("Please enter a valid URL").min(1, "Can't be empty"),
   isNew: z.boolean().optional(),
 });
