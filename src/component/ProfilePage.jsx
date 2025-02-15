@@ -5,6 +5,8 @@ import { ImageIcon } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import MobilePreview from "./MobilePreview";
 import { gql, useMutation } from "@apollo/client";
+import { Toaster } from "@/components/ui/sonner"
+import { toast } from "sonner"
 import { z } from "zod";
 
 const profileSchema = z.object({
@@ -44,6 +46,7 @@ const ProfilePage = () => {
   const [errorMessage, setErrorMessage] = useState(null);
   const [imageUrl, setImageUrl] = useState(profile.image || "");
   const [errors, setErrors] = useState({});
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
@@ -90,6 +93,8 @@ const ProfilePage = () => {
 
       setErrors({});
 
+      setIsSaving(true);
+
       await updateUserProfile({
         variables: {
           auth0Id: user,
@@ -99,17 +104,18 @@ const ProfilePage = () => {
           image: profile.image || "",
         },
       });
-
-      setSuccessMessage(true);
-      setTimeout(() => setSuccessMessage(false), 3000);
+      
+      setIsSaving(false);
+      toast("Your changes have been successfully saved!")
     } catch (error) {
+      setIsSaving(false)
       console.error("Update failed:", error);
-      setErrorMessage("Failed to update profile. Please try again.");
     }
   };
 
   return (
     <div className="min-h-screen bg-white">
+      <Toaster position="bottom-center" className=""/>
       <main className="max-w-screen-2xl mx-auto px-6 py-8 grid md:grid-cols-[308px,1fr] gap-8 md:gap-40 md:ml-40">
         <MobilePreview />
 
@@ -231,15 +237,11 @@ const ProfilePage = () => {
           <Button
             className="px-6 bg-[#8860E6] hover:bg-[#7447e7]"
             onClick={handleSave}
+            disabled={isSaving}
           >
-            Save
+            {isSaving ? "Saving" : "Save"}
           </Button>
         </div>
-        {successMessage && (
-          <div className="max-w-screen-2xl mx-auto px-6 py-4 flex justify-start text-green-500">
-            Your changes have been successfully saved!
-          </div>
-        )}
       </footer>
     </div>
   );

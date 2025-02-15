@@ -1,10 +1,18 @@
 import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Toaster } from "@/components/ui/sonner"
+import { toast } from "sonner"
 import { Github, Youtube, Linkedin } from "lucide-react"
 import { useAuth } from "@/context/AuthContext"
 
 export default function MobilePreview(){
     const { profile, links} = useAuth();
+
+    const HandleShare = () => {
+      const shareableLink = `${import.meta.env.VITE_BASE_LINK}${profile.id}`
+      navigator.clipboard.writeText(shareableLink)
+      toast("The link has been copied to your clipboard!")
+    }
   
     const getPlatformIcon = (platform) => {
       switch (platform.toLowerCase()) {
@@ -34,6 +42,7 @@ export default function MobilePreview(){
 
   return (
     <div className="w-full mx-auto relative bg-white min-h-screen">
+      <Toaster position="bottom-center" className=""/>
       <div className="absolute top-0 left-0 right-0 h-[357px] bg-[#633CFF] rounded-b-[32px]" />
       <div className="relative">
         <div className="mx-4 pt-4">
@@ -45,7 +54,9 @@ export default function MobilePreview(){
             >
               Back to Editor
             </Button>
-            <Button className="bg-[#633CFF] text-white hover:bg-[#633CFF]/90 rounded-lg h-10 px-4 py-2">
+            <Button 
+              onClick={HandleShare}
+              className="bg-[#633CFF] text-white hover:bg-[#633CFF]/90 rounded-lg h-10 px-4 py-2">
               Share Link
             </Button>
           </div>

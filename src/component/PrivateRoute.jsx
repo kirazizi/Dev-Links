@@ -33,6 +33,7 @@ const PrivateRoute = ({ children }) => {
 
   useEffect(() => {
     if (data) {
+      console.log("data first", data)
       setProfile((prev) => ({
         ...prev,
         id: data.users[0].id,

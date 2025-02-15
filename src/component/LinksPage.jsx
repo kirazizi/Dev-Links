@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Toaster } from "@/components/ui/sonner"
+import { toast } from "sonner"
 import { Input } from "@/components/ui/input";
 import { GripVertical, Github, Youtube, Linkedin, Facebook } from "lucide-react";
 import Empty from "../assets/images/illustration-empty.svg";
@@ -12,13 +14,13 @@ import { z } from 'zod';
 import { gql } from '@apollo/client';
 
 const UPDATE_LINK = gql`
-  mutation UpdateLink($id: uuid!, $title: String!, $url: String!) {
+  mutation UpdateLink($id: uuid!, $platform: String!, $url: String!) {
     update_links_by_pk(
       pk_columns: { id: $id }
-      _set: { title: $title, url: $url }
+      _set: { platform: $platform, url: $url }
     ) {
       id
-      title
+      platform
       url
     }
   }
@@ -71,6 +73,7 @@ const LinksPage = () => {
   const auth0Id = jwtDecode(token).sub;
   const [insertLinks] = useMutation(INSERT_LINKS);
   const [deleteLinks] = useMutation(DELETE_LINKS);
+  const [updateLinks] = useMutation(UPDATE_LINK);
   const [isSaving, setIsSaving] = useState(false);
 
   const addLink = () => {
@@ -118,9 +121,7 @@ const LinksPage = () => {
       );
       setRemovedLinks([]);
 
-      const LinkSave = links
-        .filter((link) => link.isNew)
-        .map((link) => ({
+      const LinkSave = links.filter((link) => link.isNew).map((link) => ({
           platform: link.platform,
           url: link.url,
           user_id: auth0Id,
@@ -130,10 +131,24 @@ const LinksPage = () => {
         await insertLinks({ variables: { objects: LinkSave } });
       }
 
+      const existingLinks = links.filter((links) => !links.isNew);
+      await Promise.all(
+        existingLinks.map(async (links) =>{
+          await updateLinks({
+            variables: {
+              id: links.id,
+              platform : links.platform,
+              url: links.url,
+            },
+          });
+        })
+      )
+
+
       setLinks(links.map((link) => ({ ...link, isNew: false })));
       setIsSaving(false);
 
-      console.log('Links saved successfully');
+      toast("Your changes have been successfully saved!")
     } catch (error) {
       console.error('Error saving links:', error);
       setIsSaving(false);
@@ -142,6 +157,7 @@ const LinksPage = () => {
 
   return (
     <div className="min-h-screen bg-white">
+      <Toaster position="bottom-center" className=""/>
       <main className="max-w-screen-2xl mx-auto px-6 py-8 grid md:grid-cols-[308px,1fr] gap-8 md:gap-40 md:ml-40">
         <MobilePreview />
         <div className="space-y-6">
