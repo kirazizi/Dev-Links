@@ -27,7 +27,7 @@ const PrivateRoute = ({ children }) => {
   const location = useLocation();
 
   // skip query if user is not authenticated
-  const { loading: queryLoading, data } = useQuery(GET_USER_PROFILE, {
+  const { loading: queryLoading, data, error } = useQuery(GET_USER_PROFILE, {
     skip: !user,
   });
 
@@ -62,6 +62,11 @@ const PrivateRoute = ({ children }) => {
   }
 
   if (!user) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  if (error){
+    localStorage.removeItem('authToken');
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 

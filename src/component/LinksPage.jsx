@@ -158,7 +158,7 @@ const LinksPage = () => {
   return (
     <div className="min-h-screen bg-white">
       <Toaster position="bottom-center" className=""/>
-      <main className="max-w-screen-2xl mx-auto px-6 py-8 grid md:grid-cols-[308px,1fr] gap-8 md:gap-40 md:ml-40">
+      <main className="max-w-screen-2xl mx-auto px-6 py-8 grid lg:grid-cols-[308px,1fr] gap-8 lg:gap-40 lg:ml-40">
         <MobilePreview />
         <div className="space-y-6">
           <div>

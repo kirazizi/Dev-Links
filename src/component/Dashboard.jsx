@@ -2,8 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useQuery, gql, useMutation } from '@apollo/client';
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Link, SmartphoneIcon} from "lucide-react"
+import { SmartphoneIcon} from "lucide-react"
 import Logo from '../assets/images/logo-devlinks-large.svg';
+import MiniLogo from '../assets/images/logo-devlinks-small.svg'
+import Link from '../assets/images/icon-links-header.svg'
+import Preview from '../assets/images/icon-preview-header.svg'
+import Profile from '../assets/images/icon-profile-details-header.svg'
 import { OrbitProgress } from 'react-loading-indicators';
 import LinksPage from './LinksPage';
 import ProfilePage from './ProfilePage';
@@ -16,24 +20,25 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <header className="border-b">
+      <header>
         <div className="max-w-screen-2xl mx-auto px-6 py-4">
           <nav className="flex items-center justify-between">
-            <img src={Logo} alt="Devlinks" className="h-8" />
-            
-            <Tabs defaultValue="links" className="flex-1 max-w-[240px] mx-auto">
-              <TabsList className="grid w-full grid-cols-2 bg-white">
-                <TabsTrigger value="links" className="flex items-center gap-2 data-[state=active]:bg-[#8860E6]/10 data-[state=active]:text-[#8860E6]"
+            <img src={Logo} alt="Devlinks" className="h-9 md:block hidden" />
+            <img src={MiniLogo} alt="Devlinks" className="h-9 md:hidden block" />
+          
+            <Tabs defaultValue="links" className="flex-1 max-w-[150px] md:max-w-[300px] mx-auto pb-2">
+              <TabsList className="grid w-full grid-cols-2 bg-white gap-4 ">
+                <TabsTrigger value="links" className="h-[40px] flex items-center gap-2 data-[state=active]:bg-[#8860E6]/10 data-[state=active]:text-[#8860E6] hover:text-[#8860E6]"
                   onClick={() => setActiveTab('links')}
                 >
-                  <Link className="h-4 w-4" />
-                  Links
+                  <img src={Link} className='h-5 w-5 md:h-4 md:w-4'/>
+                  <span className="hidden md:inline">Links</span>
                 </TabsTrigger>
-                <TabsTrigger value="details" className="flex items-center gap-2 data-[state=active]:bg-[#8860E6]/10 data-[state=active]:text-[#8860E6]"
+                <TabsTrigger value="details" className="h-[40px] flex items-center gap-2 data-[state=active]:bg-[#8860E6]/10 data-[state=active]:text-[#8860E6] hover:text-[#8860E6]"
                   onClick={() => setActiveTab('profile')}
                 >
-                  <SmartphoneIcon className="h-4 w-4" />
-                  Profile Details
+                  <img src={Profile} className="h-5 w-5 md:h-4 md:w-4" />
+                  <span className="hidden md:inline">Profile Details</span>
                 </TabsTrigger>
               </TabsList>
             </Tabs>
@@ -41,7 +46,8 @@ const Dashboard = () => {
             <Button variant="outline" className="px-5 h-10 border-purple-500"
               onClick={() => navigate('/preview')}
             >
-              Preview
+              <img src={Preview} className='h-5 w-5 md:hidden'/>
+              <span className="hidden md:inline">Preview</span>
             </Button>
           </nav>
         </div>
