@@ -5,13 +5,28 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Toaster } from "@/components/ui/sonner"
 import { toast } from "sonner"
 import { Input } from "@/components/ui/input";
-import { GripVertical, Github, Youtube, Linkedin, Facebook } from "lucide-react";
+import { GripVertical } from "lucide-react";
 import Empty from "../assets/images/illustration-empty.svg";
 import { jwtDecode } from 'jwt-decode';
 import MobilePreview from './MobilePreview';
 import { useAuth } from '@/context/AuthContext';
 import { z } from 'zod';
 import { gql } from '@apollo/client';
+
+
+import GithubImage from '../assets/images/icon-github.svg';
+import YoutubeImage from '../assets/images/icon-youtube.svg';
+import LinkedinImage from '../assets/images/icon-linkedin.svg';
+import FacebookImage from '../assets/images/icon-facebook.svg';
+import TwitterImage from '../assets/images/icon-twitter.svg';
+import DevtoImage from '../assets/images/icon-devto.svg';
+import CodewarsImage from '../assets/images/icon-codewars.svg';
+import FreecodecampImage from '../assets/images/icon-freecodecamp.svg';
+import GitlabImage from '../assets/images/icon-gitlab.svg';
+import HashnodeImage from '../assets/images/icon-hashnode.svg';
+import StackoverflowImage from '../assets/images/icon-stack-overflow.svg';
+import TwitchImage from '../assets/images/icon-twitch.svg';
+import FrontendMentorImage from '../assets/images/icon-frontend-mentor.svg';
 
 const UPDATE_LINK = gql`
   mutation UpdateLink($id: uuid!, $platform: String!, $url: String!) {
@@ -36,7 +51,7 @@ const INSERT_LINKS = gql`
       }
     }
   }
-`
+`;
 
 const DELETE_LINKS = gql`
   mutation DeleteLink($id: uuid!) {
@@ -45,7 +60,6 @@ const DELETE_LINKS = gql`
     }
   }
 `;
-
 
 const linkSchema = z.object({
   id: z.string(),
@@ -59,10 +73,26 @@ const formSchema = z.object({
 });
 
 const platforms = {
-  github: { name: 'GitHub', color: "#1A1A1A", icon: Github },
-  youtube: { name: 'YouTube', color: "#EE1D52", icon: Youtube },
-  linkedin: { name: 'LinkedIn', color: "#2D68FF", icon: Linkedin },
-  facebook: { name: 'Facebook', color: "#1877F2", icon: Facebook },
+  github: { name: 'GitHub', color: "#1A1A1A", icon: GithubImage },
+  youtube: { name: 'YouTube', color: "#EE1D52", icon: YoutubeImage },
+  linkedin: { name: 'LinkedIn', color: "#2D68FF", icon: LinkedinImage },
+  facebook: { name: 'Facebook', color: "#1877F2", icon: FacebookImage },
+  twitter: { name: 'Twitter', color: "#1DA1F2", icon: TwitterImage },
+  devto: { name: 'Dev.to', color: "#000000", icon: DevtoImage },
+  codewars: { name: 'Codewars', color: "#8A0E57", icon: CodewarsImage },
+  freecodecamp: { name: 'freeCodeCamp', color: "#2F3942", icon: FreecodecampImage },
+  gitlab: { name: 'GitLab', color: "#FC6D26", icon: GitlabImage },
+  hashnode: { name: 'Hashnode', color: "#2962FF", icon: HashnodeImage },
+  stackoverflow: { name: 'Stack Overflow', color: "#F48024", icon: StackoverflowImage },
+  twitch: { name: 'Twitch', color: "#9146FF", icon: TwitchImage },
+  frontendmentor: { name: 'Frontend Mentor', color: "#00BB8F", icon: FrontendMentorImage },
+};
+
+const PlatformIcon = ({ platform }) => {
+  const PlatformImage = platforms[platform]?.icon;
+  return PlatformImage ? (
+    <img src={PlatformImage} alt={platforms[platform].name} style={{ width: '20px', height: '20px' }} />
+  ) : null;
 };
 
 const LinksPage = () => {
@@ -111,7 +141,6 @@ const LinksPage = () => {
       }
 
       setErrors({});
-
       setIsSaving(true);
 
       await Promise.all(
@@ -121,34 +150,33 @@ const LinksPage = () => {
       );
       setRemovedLinks([]);
 
-      const LinkSave = links.filter((link) => link.isNew).map((link) => ({
-          platform: link.platform,
-          url: link.url,
-          user_id: auth0Id,
-        }));
+      const newLinks = links.filter((link) => link.isNew).map((link) => ({
+        platform: link.platform,
+        url: link.url,
+        user_id: auth0Id,
+      }));
 
-      if (LinkSave.length > 0) {
-        await insertLinks({ variables: { objects: LinkSave } });
+      if (newLinks.length > 0) {
+        await insertLinks({ variables: { objects: newLinks } });
       }
 
-      const existingLinks = links.filter((links) => !links.isNew);
+      const existingLinks = links.filter((link) => !link.isNew);
       await Promise.all(
-        existingLinks.map(async (links) =>{
+        existingLinks.map(async (link) => {
           await updateLinks({
             variables: {
-              id: links.id,
-              platform : links.platform,
-              url: links.url,
+              id: link.id,
+              platform: link.platform,
+              url: link.url,
             },
           });
         })
-      )
-
+      );
 
       setLinks(links.map((link) => ({ ...link, isNew: false })));
       setIsSaving(false);
 
-      toast("Your changes have been successfully saved!")
+      toast("Your changes have been successfully saved!");
     } catch (error) {
       console.error('Error saving links:', error);
       setIsSaving(false);
@@ -157,7 +185,7 @@ const LinksPage = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <Toaster position="bottom-center" className=""/>
+      <Toaster position="bottom-center" className="" />
       <main className="max-w-screen-2xl mx-auto px-6 py-8 grid lg:grid-cols-[308px,1fr] gap-8 lg:gap-40 lg:ml-40">
         <MobilePreview />
         <div className="space-y-6">
@@ -216,11 +244,14 @@ const LinksPage = () => {
                         <SelectTrigger className={`h-12 ${errors.links?.[index]?.platform ? "border-[#FF3939] focus-visible:ring-[#FF3939]" : ""}`}>
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent
+                            side="bottom"
+                            avoidCollisions={false}
+                          >
                           {Object.entries(platforms).map(([value, { icon: Icon }]) => (
                             <SelectItem key={value} value={value}>
                               <div className="flex items-center gap-2">
-                                <Icon className="h-5 w-5" />
+                                <PlatformIcon platform={value} />
                                 {platforms[value].name}
                               </div>
                             </SelectItem>

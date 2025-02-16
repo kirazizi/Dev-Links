@@ -1,48 +1,48 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Github, Youtube, Linkedin, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Typography, Button } from "@material-tailwind/react";
-import { useNavigate } from 'react-router-dom';
-import Logo from "../assets/images/logo-devlinks-small.svg"
+import Logo from "../assets/images/logo-devlinks-small.svg";
 import { OrbitProgress } from 'react-loading-indicators';
 
+import GithubImage from '../assets/images/icon-github.svg';
+import YoutubeImage from '../assets/images/icon-youtube.svg';
+import LinkedinImage from '../assets/images/icon-linkedin.svg';
+import FacebookImage from '../assets/images/icon-facebook.svg';
+import TwitterImage from '../assets/images/icon-twitter.svg';
+import DevtoImage from '../assets/images/icon-devto.svg';
+import CodewarsImage from '../assets/images/icon-codewars.svg';
+import FreecodecampImage from '../assets/images/icon-freecodecamp.svg';
+import GitlabImage from '../assets/images/icon-gitlab.svg';
+import HashnodeImage from '../assets/images/icon-hashnode.svg';
+import StackoverflowImage from '../assets/images/icon-stack-overflow.svg';
+import TwitchImage from '../assets/images/icon-twitch.svg';
+import FrontendMentorImage from '../assets/images/icon-frontend-mentor.svg';
+
+const platforms = {
+  github: { name: 'GitHub', color: "#1A1A1A", icon: GithubImage },
+  youtube: { name: 'YouTube', color: "#EE3939", icon: YoutubeImage },
+  linkedin: { name: 'LinkedIn', color: "#2D68FF", icon: LinkedinImage },
+  facebook: { name: 'Facebook', color: "#2442AC", icon: FacebookImage },
+  twitter: { name: 'Twitter', color: "#43B7E9", icon: TwitterImage },
+  devto: { name: 'Dev.to', color: "#333333", icon: DevtoImage },
+  codewars: { name: 'Codewars', color: "#8A1A50", icon: CodewarsImage },
+  freecodecamp: { name: 'freeCodeCamp', color: "#302267", icon: FreecodecampImage },
+  gitlab: { name: 'GitLab', color: "#EB4925", icon: GitlabImage },
+  hashnode: { name: 'Hashnode', color: "#0330D1", icon: HashnodeImage },
+  stackoverflow: { name: 'Stack Overflow', color: "#EC7100", icon: StackoverflowImage },
+  twitch: { name: 'Twitch', color: "#EE3FC8", icon: TwitchImage },
+  frontendmentor: { name: 'Frontend Mentor', color: "#FFFFFF", icon: FrontendMentorImage },
+};
 
 const PublicProfilePage = () => {
   const { userId } = useParams();
   const [profile, setProfile] = useState(null);
-  const [links, setLinks] = useState([])
+  const [links, setLinks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-
-
-const getPlatformIcon = (platform) => {
-  switch (platform.toLowerCase()) {
-    case "github":
-      return <Github className="w-5 h-5" />
-    case "youtube":
-      return <Youtube className="w-5 h-5" />
-    case "linkedin":
-      return <Linkedin className="w-5 h-5" />
-    default:
-      return null
-  }
-}
-
-const getPlatformStyles = (platform) => {
-switch (platform.toLowerCase()) {
-  case "github":ArrowRight
-    return "bg-[#1A1A1A] hover:bg-black/90"
-  case "youtube":
-    return "bg-[#EE3939] hover:bg-[#EE3939]/90"
-  case "linkedin":
-    return "bg-[#2D68FF] hover:bg-[#2D68FF]/90"
-  default:
-    return "bg-gray-800 hover:bg-gray-800/90"
-  }
-}
-
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -82,8 +82,8 @@ switch (platform.toLowerCase()) {
           throw new Error(response.data.errors[0].message);
         }
 
-        setProfile(response.data.data.users_by_pk)
-        setLinks(response.data.data.users_by_pk.links)
+        setProfile(response.data.data.users_by_pk);
+        setLinks(response.data.data.users_by_pk.links);
       } catch (error) {
         console.error('Error fetching user data:', error);
         setError(error.message);
@@ -107,7 +107,7 @@ switch (platform.toLowerCase()) {
     return (
       <div className="h-screen mx-auto grid place-items-center text-center px-8">
         <div>
-          <img src={Logo} className="w-14 h-14 mx-auto"/>
+          <img src={Logo} className="w-14 h-14 mx-auto" alt="Logo" />
           <Typography
             variant="h1"
             className="mt-10 !text-3xl !leading-snug md:!text-4xl text-[#633CFF]"
@@ -115,16 +115,16 @@ switch (platform.toLowerCase()) {
             Error 404 <br /> It looks like something went wrong.
           </Typography>
           <Typography className="mt-8 mb-14 text-[18px] font-normal text-gray-500 mx-auto md:max-w-sm">
-            Don&apos;t worry, our team is already on it.Please try refreshing
+            Don&apos;t worry, our team is already on it. Please try refreshing
             the page or come back later.
           </Typography>
           <Button
-          onClick={() => {
-            navigate("/dashboard")
-          }}
-          className="w-full px-4 md:w-[8rem] bg-[#633CFF]"
+            onClick={() => {
+              navigate("/dashboard");
+            }}
+            className="w-full px-4 md:w-[8rem] bg-[#633CFF]"
           >
-            back home
+            Back Home
           </Button>
         </div>
       </div>
@@ -135,14 +135,13 @@ switch (platform.toLowerCase()) {
     <div className="w-full mx-auto relative bg-white min-h-screen">
       <div className="top-0 left-0 right-0 h-[300px] bg-[#633CFF] rounded-b-[32px]" />
       <div className="relative">
-
         <div className="mt-[-160px] px-4 w-[300px] align-center mx-auto">
           <div className="bg-white rounded-[24px] shadow-lg p-6 space-y-2">
             <div className="flex justify-center">
               {profile.image ? (
                 <img
                   src={profile.image}
-                  alt="Profile"ArrowRight
+                  alt="Profile"
                   className="w-[104px] h-[104px] rounded-full object-cover border-4 border-white"
                 />
               ) : (
@@ -163,30 +162,51 @@ switch (platform.toLowerCase()) {
             </div>
 
             <div className="space-y-4">
-              {links.map((link, index) => (
-                <a
-                  key={index}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`flex items-center justify-between px-4 py-3 rounded-lg text-white ${getPlatformStyles(
-                    link.platform,
-                  )}`}
-                >
-                  <div className="flex items-center gap-2">
-                    {getPlatformIcon(link.platform)}
-                    <span className="font-medium">{link.platform}</span>
-                  </div>
-                  <ArrowRight className="w-4 h-4" />
-                </a>
-              ))}
+              {links.map((link, index) => {
+                const platformKey = link.platform.toLowerCase();
+                const platformData = platforms[platformKey] || platforms.github;
+                const isFrontendMentor = platformKey === "frontendmentor";
+
+                return (
+                  <a
+                    key={index}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`flex items-center justify-between px-4 py-3 rounded-lg ${
+                      isFrontendMentor
+                        ? "bg-white text-black border border-gray-300 shadow-sm"
+                        : "text-white"
+                    }`}
+                    style={{
+                      backgroundColor: isFrontendMentor
+                        ? "#FFFFFF"
+                        : platformData.color,
+                    }}
+                  >
+                    <div className="flex items-center gap-2">
+                      <img
+                        src={platformData.icon}
+                        alt={platformData.name}
+                        className={`h-5 w-5 ${isFrontendMentor ? "" : "filter brightness-0 invert"}`} 
+                        style={isFrontendMentor ? {} : { filter: "brightness(0) invert(1)" }}
+                      />
+                      <span className="font-medium">{platformData.name}</span>
+                    </div>
+                    <ArrowRight
+                      className={`w-4 h-4 ${
+                        isFrontendMentor ? "text-black" : "text-white"
+                      }`}
+                    />
+                  </a>
+                );
+              })}
             </div>
           </div>
         </div>
       </div>
     </div>
-  )
-}
-
+  );
+};
 
 export default PublicProfilePage;
