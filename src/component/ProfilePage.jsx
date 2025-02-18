@@ -42,7 +42,9 @@ const UPDATE_USER_PROFILE = gql`
 const ProfilePage = () => {
   const { profile, setProfile, user } = useAuth();
   const [successMessage, setSuccessMessage] = useState(false);
-  const [updateUserProfile] = useMutation(UPDATE_USER_PROFILE);
+  const [updateUserProfile] = useMutation(UPDATE_USER_PROFILE, {
+    fetchPolicy: "no-cache",
+  });
   const [errorMessage, setErrorMessage] = useState(null);
   const [imageUrl, setImageUrl] = useState(profile.image || "");
   const [errors, setErrors] = useState({});

@@ -51,7 +51,7 @@ const PrivateRoute = ({ children }) => {
       }));
       setLinks(transformedLinks);
     }
-  }, [data, setProfile, setLinks]);
+  }, [data]);
 
   if (authLoading || queryLoading) {
     return (

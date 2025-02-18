@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Toaster } from "@/components/ui/sonner"
@@ -11,7 +11,6 @@ import { jwtDecode } from 'jwt-decode';
 import MobilePreview from './MobilePreview';
 import { useAuth } from '@/context/AuthContext';
 import { z } from 'zod';
-import { gql } from '@apollo/client';
 
 
 import GithubImage from '../assets/images/icon-github.svg';
@@ -101,9 +100,15 @@ const LinksPage = () => {
   const [errors, setErrors] = useState({});
   const token = localStorage.getItem('authToken');
   const auth0Id = jwtDecode(token).sub;
-  const [insertLinks] = useMutation(INSERT_LINKS);
-  const [deleteLinks] = useMutation(DELETE_LINKS);
-  const [updateLinks] = useMutation(UPDATE_LINK);
+  const [insertLinks] = useMutation(INSERT_LINKS, {
+    fetchPolicy: "no-cache",
+  });
+  const [deleteLinks] = useMutation(DELETE_LINKS, {
+    fetchPolicy: "no-cache",
+  });
+  const [updateLinks] = useMutation(UPDATE_LINK, {
+    fetchPolicy: "no-cache",
+  });
   const [isSaving, setIsSaving] = useState(false);
 
   const addLink = () => {

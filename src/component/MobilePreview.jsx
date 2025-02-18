@@ -35,7 +35,7 @@ const platforms = {
 
 const MobilePreview = () => {
   const { links, profile } = useAuth()
-
+  
   return (
     <div className="relative hidden lg:block w-[308px]">
       <img src={MobilePreviewImage} alt="Mobile Preview" className="w-full" />
