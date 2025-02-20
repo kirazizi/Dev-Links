@@ -189,10 +189,9 @@ const LinksPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white lg:w-[60%]">
       <Toaster position="bottom-center" className="" />
-      <main className="max-w-screen-2xl mx-auto px-6 py-8 grid lg:grid-cols-[308px,1fr] gap-8 lg:gap-40 lg:ml-40">
-        <MobilePreview />
+      <main className="max-w-screen-2xl mx-auto px-6 py-8 grid ">
         <div className="space-y-6">
           <div>
             <h1 className="text-4xl font-bold mb-2">Customize your links</h1>

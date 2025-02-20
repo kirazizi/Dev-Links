@@ -37,7 +37,7 @@ const MobilePreview = () => {
   const { links, profile } = useAuth()
   
   return (
-    <div className="relative hidden lg:block w-[308px]">
+    <div className="relative w-[308px] hidden lg:block">
       <img src={MobilePreviewImage} alt="Mobile Preview" className="w-full" />
 
       <div className="absolute top-[65px] left-0 right-0 flex flex-col items-center">

@@ -12,6 +12,8 @@ import { OrbitProgress } from 'react-loading-indicators';
 import LinksPage from './LinksPage';
 import ProfilePage from './ProfilePage';
 import { useNavigate } from 'react-router-dom';
+import MobilePreview from '../component/MobilePreview'
+
 
 
 const Dashboard = () => {
@@ -53,16 +55,19 @@ const Dashboard = () => {
         </div>
       </header>
 
-    <div className="min-h-screen bg-white">
-          {
-            activeTab === 'links' ? (
-              <LinksPage />
+      <div className="lg:flex">
+        <div className='flex w-[40%] justify-center items-center'>
+          <MobilePreview />
+        </div>
+        {
+          activeTab === 'links' ? (
+            <LinksPage />
             ) : (
               <ProfilePage />
             )
           }
+        </div>
       </div>
-    </div>
   );
 };
 
