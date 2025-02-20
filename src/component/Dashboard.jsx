@@ -30,16 +30,22 @@ const Dashboard = () => {
           
             <Tabs defaultValue="links" className="flex-1 max-w-[150px] md:max-w-[300px] mx-auto pb-2">
               <TabsList className="grid w-full grid-cols-2 bg-white gap-4 ">
-                <TabsTrigger value="links" className="h-[40px] flex items-center gap-2 data-[state=active]:bg-[#8860E6]/10 data-[state=active]:text-[#8860E6] hover:text-[#8860E6]"
+                <TabsTrigger value="links" className="group h-[40px] flex items-center gap-2 data-[state=active]:bg-[#8860E6]/10 data-[state=active]:text-[#8860E6] hover:text-[#8860E6]"
                   onClick={() => setActiveTab('links')}
                 >
-                  <img src={Link} className='h-5 w-5 md:h-4 md:w-4'/>
+                  <img 
+                    src={Link} 
+                    className="h-5 w-5 md:h-4 md:w-4 group-data-[state=active]:[filter:invert(45%)_sepia(65%)_saturate(825%)_hue-rotate(217deg)_brightness(95%)_contrast(93%)]"
+                  />
                   <span className="hidden md:inline">Links</span>
                 </TabsTrigger>
-                <TabsTrigger value="details" className="h-[40px] flex items-center gap-2 data-[state=active]:bg-[#8860E6]/10 data-[state=active]:text-[#8860E6] hover:text-[#8860E6]"
+                <TabsTrigger value="details" className="group h-[40px] flex items-center gap-2 data-[state=active]:bg-[#8860E6]/10 data-[state=active]:text-[#8860E6] hover:text-[#8860E6]"
                   onClick={() => setActiveTab('profile')}
                 >
-                  <img src={Profile} className="h-5 w-5 md:h-4 md:w-4" />
+                  <img 
+                    src={Profile} 
+                    className="h-5 w-5 md:h-4 md:w-4 group-data-[state=active]:[filter:invert(45%)_sepia(65%)_saturate(825%)_hue-rotate(217deg)_brightness(95%)_contrast(93%)]"
+                  />
                   <span className="hidden md:inline">Profile Details</span>
                 </TabsTrigger>
               </TabsList>
@@ -48,7 +54,9 @@ const Dashboard = () => {
             <Button variant="outline" className="px-5 h-10 border-purple-500"
               onClick={() => navigate('/preview')}
             >
-              <img src={Preview} className='h-5 w-5 md:hidden'/>
+              <img src={Preview} 
+              className='h-5 w-5 md:hidden'
+              />
               <span className="hidden md:inline">Preview</span>
             </Button>
           </nav>

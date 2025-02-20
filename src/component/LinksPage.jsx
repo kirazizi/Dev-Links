@@ -5,10 +5,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Toaster } from "@/components/ui/sonner"
 import { toast } from "sonner"
 import { Input } from "@/components/ui/input";
-import { GripVertical } from "lucide-react";
+import GripVertical from "../assets/images/icon-drag-and-drop.svg"
 import Empty from "../assets/images/illustration-empty.svg";
 import { jwtDecode } from 'jwt-decode';
-import MobilePreview from './MobilePreview';
 import { useAuth } from '@/context/AuthContext';
 import { z } from 'zod';
 
@@ -194,7 +193,7 @@ const LinksPage = () => {
       <main className="max-w-screen-2xl mx-auto px-6 py-8 grid ">
         <div className="space-y-6">
           <div>
-            <h1 className="text-4xl font-bold mb-2">Customize your links</h1>
+            <h1 className="md:text-4xl text-2xl font-bold mb-2">Customize your links</h1>
             <p className="text-gray-500">
               Add/edit/remove links below and then share all your profiles with the world!
             </p>
@@ -227,8 +226,8 @@ const LinksPage = () => {
                 <div key={link.id} className="p-5 bg-gray-50 rounded-lg space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <GripVertical className="h-6 w-6 text-gray-500" />
-                      <span className="font-bold">Link #{index + 1}</span>
+                      <img src={GripVertical} className="h-4 w-4 text-gray-500"></img>
+                      <span className="font-bold text-gray-500">Link #{index + 1}</span>
                     </div>
                     <button
                       onClick={() => removeLink(link.id)}
@@ -240,7 +239,7 @@ const LinksPage = () => {
 
                   <div className="space-y-3">
                     <div className="space-y-2">
-                      <label className="text-sm text-gray-500">Platform</label>
+                      <label className="text-sm">Platform</label>
                       <Select
                         value={link.platform}
                         onValueChange={(value) => updateLink(link.id, { platform: value })}
@@ -252,9 +251,9 @@ const LinksPage = () => {
                             side="bottom"
                             avoidCollisions={false}
                           >
-                          {Object.entries(platforms).map(([value, { icon: Icon }]) => (
+                          {Object.entries(platforms).map(([value]) => (
                             <SelectItem key={value} value={value}>
-                              <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-2 hover:[filter:brightness(0)_saturate(100%)_invert(32%)_sepia(74%)_saturate(1215%)_hue-rotate(235deg)_brightness(98%)_contrast(102%)]">
                                 <PlatformIcon platform={value} />
                                 {platforms[value].name}
                               </div>
@@ -268,7 +267,7 @@ const LinksPage = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-sm text-gray-500">Link</label>
+                      <label className="text-sm">Link</label>
                       <div className="relative">
                         <Input
                           value={link.url}

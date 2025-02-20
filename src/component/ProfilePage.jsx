@@ -121,14 +121,14 @@ const ProfilePage = () => {
       <main className="max-w-screen-2xl mx-auto px-6 py-8 grid ">
         <div className="space-y-6">
           <div>
-            <h1 className="text-4xl font-bold mb-2">Profile Details</h1>
+            <h1 className="md:text-4xl text-2xl font-bold mb-2">Profile Details</h1>
             <p className="text-gray-500">
               Add your details to create a personal touch to your profile.
             </p>
           </div>
 
           <div className="space-y-6">
-            <div className="p-5 bg-gray-50 rounded-lg space-y-4 md:flex md:items-center justify-between">
+            <div className="p-5 bg-gray-50 rounded-lg space-y-4 md:flex items-center">
               <label className="text-sm text-gray-500 w-[30%]">Profile picture</label>
               <div className="md:flex md:items-center gap-8">
                 <div className="relative group">
