@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -20,6 +20,7 @@ const loginSchema = z.object({
 export default function LoginPage() {
   const { user, login } = useAuth()
   const navigate = useNavigate()
+  const [error, setError] = useState("");
 
   const form = useForm({
     resolver: zodResolver(loginSchema),
@@ -50,10 +51,11 @@ export default function LoginPage() {
 
       onLoginSuccess(response.data)
     } catch (error) {
-      console.error("Error logging in:", error)
-      form.setError("root", {
-        message: "Invalid email or password",
-      })
+      if (error.response?.status === 403) {
+        setError("Invalid email or password");
+      } else {
+        setError("An error occurred. Please try again later.");
+      }
     }
   }
 
@@ -79,6 +81,7 @@ export default function LoginPage() {
           <p className="text-[#737373]">Add your details below to get back into the app</p>
         </div>
 
+        
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleLogin)} className="space-y-6">
             <FormField
@@ -153,6 +156,13 @@ export default function LoginPage() {
             </Button>
           </form>
         </Form>
+
+        {error && (
+          <div className="text-[#FF3939] text-sm text-center">
+            {error}
+          </div>
+        )}
+
 
         <p className="text-center text-[#737373]">
           Don't have an account?{" "}

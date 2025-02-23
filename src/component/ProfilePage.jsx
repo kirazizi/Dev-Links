@@ -66,11 +66,11 @@ const ProfilePage = () => {
           }
         );
         const data = await response.json();
-        console.log("Image uploaded:", data);
+        toast("Images have been uploaded")
         setImageUrl(data.url);
         setProfile((prev) => ({ ...prev, image: data.url }));
       } catch (error) {
-        console.error("Error uploading image:", error);
+        toast("Failed uploading image")
       }
     }
   };
@@ -111,7 +111,6 @@ const ProfilePage = () => {
       toast("Your changes have been successfully saved!")
     } catch (error) {
       setIsSaving(false)
-      console.error("Update failed:", error);
     }
   };
 

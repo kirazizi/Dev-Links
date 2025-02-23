@@ -85,7 +85,6 @@ const PublicProfilePage = () => {
         setProfile(response.data.data.users_by_pk);
         setLinks(response.data.data.users_by_pk.links);
       } catch (error) {
-        console.error('Error fetching user data:', error);
         setError(error.message);
       } finally {
         setLoading(false);

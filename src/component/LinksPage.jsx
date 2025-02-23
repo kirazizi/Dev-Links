@@ -182,7 +182,6 @@ const LinksPage = () => {
 
       toast("Your changes have been successfully saved!");
     } catch (error) {
-      console.error('Error saving links:', error);
       setIsSaving(false);
     }
   };

@@ -4,6 +4,7 @@ import * as z from "zod"
 import axios from "axios"
 import { Mail, Lock } from "lucide-react"
 import { useNavigate } from "react-router-dom"
+import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -23,6 +24,7 @@ const signupSchema = z
 
 export default function SignupPage() {
   const navigate = useNavigate()
+  const [error, setError] = useState("");
 
   const form = useForm({
     resolver: zodResolver(signupSchema),
@@ -52,10 +54,11 @@ export default function SignupPage() {
 
       navigate("/login")
     } catch (error) {
-      console.error("Signup error:", error)
-      form.setError("root", {
-        message: error.response?.data?.message || "Signup failed. Please try again.",
-      })
+      if (error.response?.status === 400) {
+        setError("This email address is already");
+      } else {
+        setError("An error occurred. Please try again later.");
+      }
     }
   }
 
@@ -70,10 +73,6 @@ export default function SignupPage() {
           <h1 className="text-4xl font-bold text-[#333333]">Create account</h1>
           <p className="text-[#737373]">Let's get you started sharing your links!</p>
         </div>
-
-        {form.formState.errors.root && (
-          <div className="text-[#FF3939] text-sm text-center">{form.formState.errors.root.message}</div>
-        )}
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSignup)} className="space-y-6">
@@ -188,6 +187,12 @@ export default function SignupPage() {
             </Button>
           </form>
         </Form>
+
+        {error && (
+          <div className="text-[#FF3939] text-sm text-center">
+            {error}
+          </div>
+        )}
 
         <p className="text-center text-[#737373]">
           Already have an account?{" "}
