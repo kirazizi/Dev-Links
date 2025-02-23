@@ -2,16 +2,16 @@ import React, { useState } from 'react';
 import { gql, useMutation } from '@apollo/client';
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { Toaster } from "@/components/ui/sonner"
 import { toast } from "sonner"
 import { Input } from "@/components/ui/input";
-import GripVertical from "../assets/images/icon-drag-and-drop.svg"
-import Empty from "../assets/images/illustration-empty.svg";
 import { jwtDecode } from 'jwt-decode';
 import { useAuth } from '@/context/AuthContext';
 import { z } from 'zod';
 
-
+import GripVertical from "../assets/images/icon-drag-and-drop.svg"
+import Empty from "../assets/images/illustration-empty.svg";
 import GithubImage from '../assets/images/icon-github.svg';
 import YoutubeImage from '../assets/images/icon-youtube.svg';
 import LinkedinImage from '../assets/images/icon-linkedin.svg';
@@ -110,6 +110,15 @@ const LinksPage = () => {
   });
   const [isSaving, setIsSaving] = useState(false);
 
+  const handleDragEnd = (result) => {
+    if (!result.destination) return;
+    
+    const items = Array.from(links);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+    setLinks(items);
+  };
+
   const addLink = () => {
     const newLink = {
       id: `${crypto.randomUUID()}`,
@@ -183,13 +192,14 @@ const LinksPage = () => {
       toast("Your changes have been successfully saved!");
     } catch (error) {
       setIsSaving(false);
+      toast("An error occurred while saving your changes.");
     }
   };
 
   return (
     <div className="min-h-screen bg-white lg:w-[60%]">
       <Toaster position="bottom-center" className="" />
-      <main className="max-w-screen-2xl mx-auto px-6 py-8 grid ">
+      <main className="max-w-screen-2xl mx-auto px-6 py-8 grid">
         <div className="space-y-6">
           <div>
             <h1 className="md:text-4xl text-2xl font-bold mb-2">Customize your links</h1>
@@ -220,71 +230,105 @@ const LinksPage = () => {
               </div>
             </div>
           ) : (
-            <div className="space-y-6">
-              {links.map((link, index) => (
-                <div key={link.id} className="p-5 bg-gray-50 rounded-lg space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <img src={GripVertical} className="h-4 w-4 text-gray-500"></img>
-                      <span className="font-bold text-gray-500">Link #{index + 1}</span>
-                    </div>
-                    <button
-                      onClick={() => removeLink(link.id)}
-                      className="text-gray-500 hover:text-gray-700"
-                    >
-                      Remove
-                    </button>
-                  </div>
-
-                  <div className="space-y-3">
-                    <div className="space-y-2">
-                      <label className="text-sm">Platform</label>
-                      <Select
-                        value={link.platform}
-                        onValueChange={(value) => updateLink(link.id, { platform: value })}
+            <DragDropContext onDragEnd={handleDragEnd}>
+              <Droppable droppableId="links">
+                {(provided) => (
+                  <div 
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                    className="space-y-6"
+                  >
+                    {links.map((link, index) => (
+                      <Draggable 
+                        key={link.id}
+                        draggableId={link.id}
+                        index={index}
                       >
-                        <SelectTrigger className={`h-12 ${errors.links?.[index]?.platform ? "border-[#FF3939] focus-visible:ring-[#FF3939]" : ""}`}>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent
-                            side="bottom"
-                            avoidCollisions={false}
+                        {(provided) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            className="p-5 bg-gray-50 rounded-lg space-y-3"
                           >
-                          {Object.entries(platforms).map(([value]) => (
-                            <SelectItem key={value} value={value}>
-                              <div className="flex items-center gap-2 hover:[filter:brightness(0)_saturate(100%)_invert(32%)_sepia(74%)_saturate(1215%)_hue-rotate(235deg)_brightness(98%)_contrast(102%)]">
-                                <PlatformIcon platform={value} />
-                                {platforms[value].name}
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <div
+                                  {...provided.dragHandleProps}
+                                  className="touch-none"
+                                >
+                                  <img 
+                                    src={GripVertical} 
+                                    className="h-4 w-4 text-gray-500 cursor-move"
+                                    alt="Drag handle"
+                                  />
+                                </div>
+                                <span className="font-bold text-gray-500">
+                                  Link #{index + 1}
+                                </span>
                               </div>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      {errors.links?.[index]?.platform && (
-                        <p className="text-[#FF3939] text-sm mt-1">{errors.links[index].platform.message}</p>
-                      )}
-                    </div>
+                              <button
+                                onClick={() => removeLink(link.id)}
+                                className="text-gray-500 hover:text-gray-700"
+                              >
+                                Remove
+                              </button>
+                            </div>
 
-                    <div className="space-y-2">
-                      <label className="text-sm">Link</label>
-                      <div className="relative">
-                        <Input
-                          value={link.url}
-                          onChange={(e) => updateLink(link.id, { url: e.target.value })}
-                          placeholder={`e.g. https://${link.platform}.com/username`}
-                          className={`h-12 pr-24 ${errors.links?.[index]?.url ? "border-[#FF3939] focus-visible:ring-[#FF3939]" : ""}`}
-                        />
-                        {errors.links?.[index]?.url && (
-                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[#FF3939]">
-                            {errors.links[index].url.message}
-                          </span>
+                            <div className="space-y-3">
+                              <div className="space-y-2">
+                                <label className="text-sm">Platform</label>
+                                <Select
+                                  value={link.platform}
+                                  onValueChange={(value) => updateLink(link.id, { platform: value })}
+                                >
+                                  <SelectTrigger className={`h-12 ${errors.links?.[index]?.platform ? "border-[#FF3939] focus-visible:ring-[#FF3939]" : ""}`}>
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent
+                                    side="bottom"
+                                    avoidCollisions={false}
+                                  >
+                                    {Object.entries(platforms).map(([value]) => (
+                                      <SelectItem key={value} value={value}>
+                                        <div className="flex items-center gap-2 hover:[filter:brightness(0)_saturate(100%)_invert(32%)_sepia(74%)_saturate(1215%)_hue-rotate(235deg)_brightness(98%)_contrast(102%)]">
+                                          <PlatformIcon platform={value} />
+                                          {platforms[value].name}
+                                        </div>
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                                {errors.links?.[index]?.platform && (
+                                  <p className="text-[#FF3939] text-sm mt-1">{errors.links[index].platform.message}</p>
+                                )}
+                              </div>
+
+                              <div className="space-y-2">
+                                <label className="text-sm">Link</label>
+                                <div className="relative">
+                                  <Input
+                                    value={link.url}
+                                    onChange={(e) => updateLink(link.id, { url: e.target.value })}
+                                    placeholder={`e.g. https://${link.platform}.com/username`}
+                                    className={`h-12 pr-24 ${errors.links?.[index]?.url ? "border-[#FF3939] focus-visible:ring-[#FF3939]" : ""}`}
+                                  />
+                                  {errors.links?.[index]?.url && (
+                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[#FF3939]">
+                                      {errors.links[index].url.message}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
                         )}
-                      </div>
-                    </div>
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
                   </div>
-                </div>
-              ))}
-            </div>
+                )}
+              </Droppable>
+            </DragDropContext>
           )}
         </div>
       </main>
