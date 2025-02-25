@@ -1,19 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { useQuery, gql, useMutation } from '@apollo/client';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { SmartphoneIcon} from "lucide-react"
 import Logo from '../assets/images/logo-devlinks-large.svg';
 import MiniLogo from '../assets/images/logo-devlinks-small.svg'
 import Link from '../assets/images/icon-links-header.svg'
 import Preview from '../assets/images/icon-preview-header.svg'
 import Profile from '../assets/images/icon-profile-details-header.svg'
-import { OrbitProgress } from 'react-loading-indicators';
 import LinksPage from './LinksPage';
 import ProfilePage from './ProfilePage';
 import { useNavigate } from 'react-router-dom';
 import MobilePreview from '../component/MobilePreview'
-
 
 
 const Dashboard = () => {

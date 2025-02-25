@@ -1,5 +1,3 @@
-import { useState } from 'react'
-import { Auth0Provider, useAuth0 } from '@auth0/auth0-react'
 import { BrowserRouter, Routes } from 'react-router-dom'
 import { Route } from 'react-router-dom'
 import client from './ApolloClient'

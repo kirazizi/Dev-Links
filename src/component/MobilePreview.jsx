@@ -1,6 +1,6 @@
 import React from 'react';
 import MobilePreviewImage from "../assets/images/illustration-phone-mockup.svg";
-import { Github, Youtube, Linkedin, Facebook, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 import GithubImage from '../assets/images/icon-github.svg';

@@ -12,8 +12,8 @@ import { z } from "zod";
 const profileSchema = z.object({
   first_name: z.string().min(1, "Can't be empty"),
   last_name: z.string().min(1, "Can't be empty"),
-  email: z.string().optional(),
-  image: z.string().optional(),
+  email: z.string().nullable().optional(),
+  image: z.string().nullable().optional(),
 });
 
 const UPDATE_USER_PROFILE = gql`
@@ -41,11 +41,9 @@ const UPDATE_USER_PROFILE = gql`
 
 const ProfilePage = () => {
   const { profile, setProfile, user } = useAuth();
-  const [successMessage, setSuccessMessage] = useState(false);
   const [updateUserProfile] = useMutation(UPDATE_USER_PROFILE, {
     fetchPolicy: "no-cache",
   });
-  const [errorMessage, setErrorMessage] = useState(null);
   const [imageUrl, setImageUrl] = useState(profile.image || "");
   const [errors, setErrors] = useState({});
   const [isSaving, setIsSaving] = useState(false);
@@ -89,10 +87,11 @@ const ProfilePage = () => {
         validationResult.error.errors.forEach((err) => {
           errorMap[err.path[0]] = { message: err.message };
         });
+        console.log(errorMap);
         setErrors(errorMap);
         return;
       }
-
+      
       setErrors({});
 
       setIsSaving(true);
